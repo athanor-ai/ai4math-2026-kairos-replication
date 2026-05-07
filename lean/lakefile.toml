@@ -1,0 +1,10 @@
+name = "CreditAssignment"
+defaultTargets = ["CreditAssignment"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+version = "git#master"
+
+[[lean_lib]]
+name = "CreditAssignment"
