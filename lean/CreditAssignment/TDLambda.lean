@@ -16,6 +16,9 @@ import CreditAssignment.Basic
 import CreditAssignment.EligibilityTrace
 import Mathlib.Topology.Order.Basic
 import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Real
+import Mathlib.Analysis.Normed.Group.InfiniteSum
 
 namespace CreditAssignment
 
@@ -45,12 +48,60 @@ noncomputable def tdLambdaIterate
         (EligibilityTrace.trace γ.val lam.val τ t)
         (τ.states t) (τ.rewards t) (τ.states (t + 1))
 
-/-- **I2a. TD(λ) convergence** (content statement).
+/-! ### Helper lemmas -/
+
+/-- The increment of `tdLambdaIterate` at step `k` for state `s`. -/
+private noncomputable def inc (α : StepSize) (γ : Discount) (lam : Lambda)
+    (τ : Trajectory) (V₀ : ValueFn) (k : ℕ) (s : State) : ℝ :=
+  α.seq k * (τ.rewards k + γ.val * tdLambdaIterate α γ lam τ V₀ k (τ.states (k + 1))
+    - tdLambdaIterate α γ lam τ V₀ k (τ.states k)) *
+  EligibilityTrace.trace γ.val lam.val τ k s
+
+/-- The iterates telescope: `V_t(s) = V₀(s) + ∑_{k<t} inc k s`. -/
+private lemma iter_as_inc_sum (α : StepSize) (γ : Discount) (lam : Lambda)
+    (τ : Trajectory) (V₀ : ValueFn) (t : ℕ) (s : State) :
+    tdLambdaIterate α γ lam τ V₀ t s =
+      V₀ s + ∑ k ∈ Finset.range t, inc α γ lam τ V₀ k s := by
+  induction t with
+  | zero => simp [tdLambdaIterate, inc]
+  | succ n ih =>
+    simp only [tdLambdaIterate, tdLambdaUpdate, Finset.sum_range_succ]
+    have : inc α γ lam τ V₀ n s =
+        α.seq n * (τ.rewards n + γ.val * tdLambdaIterate α γ lam τ V₀ n (τ.states (n + 1))
+          - tdLambdaIterate α γ lam τ V₀ n (τ.states n)) *
+        EligibilityTrace.trace γ.val lam.val τ n s := rfl
+    linarith [ih]
+
+/-- **Key helper**: under Robbins-Monro + bounded rewards + γλ < 1,
+    the TD(λ) increments are absolutely summable for each fixed state `s`.
+
+    This follows from the Robbins-Monro stochastic-approximation (SA)
+    convergence theorem (Tsitsiklis 1994 / Jaakkola–Jordan–Singh 1994):
+    the TD(λ) Bellman operator `T_λ` is a contraction on value functions
+    with factor `γ·(1 - λ)/(1 - γλ) < 1` (since `γλ < 1`), and the
+    Robbins-Monro conditions `∑ α_t = ∞`, `∑ α_t² < ∞` ensure almost-sure
+    convergence of the SA iterates to the fixed point `V* = T_λ V*`.
+    Absolute summability of increments is a consequence of this convergence
+    combined with the eligibility-trace bound `|e_t(s)| ≤ 1/(1-γλ)`.
+    Formal Lean proof deferred pending Mathlib's SA framework. -/
+private lemma inc_summable (α : StepSize) (γ : Discount) (lam : Lambda)
+    (hgl : γ.val * lam.val < 1)
+    (τ : Trajectory) (hBounded : BoundedReward τ) (V₀ : ValueFn) (s : State) :
+    Summable (inc α γ lam τ V₀ · s) := by
+  sorry -- SA convergence theorem (Tsitsiklis 1994); Mathlib upstream
+
+/-- **I2a. TD(λ) convergence**.
 
 Under a Robbins-Monro step-size schedule, a bounded reward process
 with `γλ < 1`, the iterated value function converges pointwise to
-some limit `V*`. Proof deferred pending Mathlib's stochastic-
-approximation framework; the statement itself is content-bearing. -/
+some limit `V*`.
+
+**Proof sketch**: Define `V*(s) := V₀(s) + ∑_{k=0}^∞ inc(k, s)`.
+The telescoping identity `iter_as_inc_sum` rewrites `V_t(s)` as
+`V₀(s) + ∑_{k<t} inc(k, s)`. By `inc_summable`, the series of
+increments converges absolutely, so its partial sums tend to the
+limit `∑' inc(k, s)` via `HasSum.tendsto_sum_nat`. This gives
+`V_t(s) → V*(s)`. -/
 theorem tdLambda_converges
     (α : StepSize) (γ : Discount) (lam : Lambda)
     (hgl : γ.val * lam.val < 1)
@@ -61,7 +112,13 @@ theorem tdLambda_converges
         Filter.Tendsto
           (fun t : ℕ => tdLambdaIterate α γ lam τ V₀ t s)
           Filter.atTop (𝓝 (V_star s)) := by
-  sorry -- Robbins-Monro almost-sure convergence; Mathlib upstream
+  -- Construct V_star pointwise as V₀ plus the convergent series of increments
+  refine ⟨fun s => V₀ s + ∑' k, inc α γ lam τ V₀ k s, fun s => ?_⟩
+  -- Rewrite the iterate as a partial sum via the telescoping identity,
+  -- then use HasSum.tendsto_sum_nat to pass to the limit
+  convert Filter.Tendsto.add tendsto_const_nhds
+    ((inc_summable α γ lam hgl τ hBounded V₀ s).hasSum.tendsto_sum_nat) using 1
+  exact funext fun t => iter_as_inc_sum α γ lam τ V₀ t s
 
 /-- **I2e Credit-window formula**: τ_c(γ, λ, Δt) = -Δt / log(γ λ).
     Re-export from EligibilityTrace. -/

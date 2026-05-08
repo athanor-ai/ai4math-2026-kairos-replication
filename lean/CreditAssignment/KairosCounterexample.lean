@@ -53,6 +53,50 @@ noncomputable def actor_increment (t : ℕ) : ℝ :=
 noncomputable def actor_partial_sum (T : ℕ) : ℝ :=
   (Finset.range T).sum actor_increment
 
+/-- For t ≥ 1, the actor increment t/(t+1)² is at least 1/(2(t+1)).
+    This follows from t/(t+1) ≥ 1/2, i.e. 2t ≥ t+1, i.e. t ≥ 1. -/
+private lemma actor_increment_ge_half_harmonic (t : ℕ) (ht : 1 ≤ t) :
+    1 / (2 * ((t : ℝ) + 1)) ≤ actor_increment t := by
+  simp only [actor_increment, αθ_kairos]
+  have htR : (1 : ℝ) ≤ t := Nat.one_le_cast.mpr ht
+  rw [show (t : ℝ) * (1 / ((t : ℝ) + 1) ^ 2) = (t : ℝ) / ((t : ℝ) + 1) ^ 2 by ring]
+  rw [div_le_div_iff₀ (by positivity) (by positivity)]
+  nlinarith [sq_nonneg ((t : ℝ) + 1)]
+
+/-- The partial sums of actor increments dominate (1/2)·H_T − 1/2,
+    where H_T = Σ_{i<T} 1/(i+1) is the T-th harmonic number.
+
+    At t=0 the actor increment is 0 while the harmonic weight is 1/2,
+    introducing a one-time deficit of 1/2.  For t ≥ 1 the pointwise
+    bound holds exactly, so the deficit never grows. -/
+private lemma actor_partial_sum_ge (T : ℕ) :
+    (1/2) * (∑ i ∈ Finset.range T, (1 / ((i:ℝ) + 1))) - 1/2 ≤ actor_partial_sum T := by
+  simp only [actor_partial_sum]
+  induction T with
+  | zero => simp
+  | succ T ih =>
+    rw [Finset.sum_range_succ, Finset.sum_range_succ]
+    by_cases hT : 1 ≤ T
+    · have h := actor_increment_ge_half_harmonic T hT
+      have heq : 1 / (2 * ((T : ℝ) + 1)) = 1/2 * (1 / ((T : ℝ) + 1)) := by field_simp
+      linarith [heq ▸ h]
+    · have hT0 : T = 0 := by omega
+      subst hT0
+      simp [actor_increment, αθ_kairos]
+
+/-- (1/2)·H_T − 1/2 → +∞ because the harmonic series diverges and
+    scaling by 1/2 > 0 and shifting by −1/2 preserve divergence to +∞. -/
+private lemma harmonic_minus_half_atTop :
+    Filter.Tendsto (fun T : ℕ => (1/2) * (∑ i ∈ Finset.range T, (1 / ((i:ℝ) + 1))) - 1/2)
+      Filter.atTop Filter.atTop := by
+  have hH := Real.tendsto_sum_range_one_div_nat_succ_atTop
+  have hscaled : Filter.Tendsto (fun T : ℕ => 1/2 * ∑ i ∈ Finset.range T, (1 / ((i:ℝ) + 1)))
+      Filter.atTop Filter.atTop :=
+    hH.const_mul_atTop (by norm_num : (0:ℝ) < 1/2)
+  have key := hscaled.atTop_add (g := fun _ => -(1/2 : ℝ)) (C := -(1/2)) tendsto_const_nhds
+  simp_rw [sub_eq_add_neg]
+  exact key
+
 /-- The key divergence fact the Kairos planner identified.
 
     Claim: the partial sums Σ_{t<T} t/(t+1)² grow without bound.
@@ -66,7 +110,14 @@ noncomputable def actor_partial_sum (T : ℕ) : ℝ :=
     Mathlib stochastic-approximation upstream. -/
 theorem kairos_actor_partial_sum_unbounded :
     ¬ ∃ L : ℝ, Filter.Tendsto actor_partial_sum Filter.atTop (nhds L) := by
-  sorry
+  intro ⟨L, hL⟩
+  -- Show actor_partial_sum → +∞ by comparison with the harmonic lower bound
+  have hge : ∀ T, (1/2) * (∑ i ∈ Finset.range T, (1 / ((i:ℝ) + 1))) - 1/2 ≤ actor_partial_sum T :=
+    actor_partial_sum_ge
+  have hatTop : Filter.Tendsto actor_partial_sum Filter.atTop Filter.atTop :=
+    Filter.tendsto_atTop_mono hge harmonic_minus_half_atTop
+  -- A sequence tending to +∞ cannot tend to any finite limit
+  exact not_tendsto_nhds_of_tendsto_atTop hatTop L hL
 
 end KairosCounterexample
 end ActorCritic
