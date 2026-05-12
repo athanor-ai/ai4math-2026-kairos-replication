@@ -8,7 +8,7 @@ AI4MATH 2026 workshop submission (ICML).
 cd lean && lake build
 ```
 
-Builds the full Lean 4 library (14 closed theorems, 3 Robbins-Monro content goals with `sorry`).
+Builds the full Lean 4 library.
 
 ## Structure
 
@@ -16,14 +16,27 @@ Builds the full Lean 4 library (14 closed theorems, 3 Robbins-Monro content goal
 lean/                    Lean 4 formal proofs
   CreditAssignment/      Per-rule theorem modules
   CreditAssignment.lean  Root import
-  lean-toolchain         Lean version pin
+  lean-toolchain         Lean version pin (v4.28.0)
+  lakefile.toml          Mathlib dependency
 ```
 
 ## Lean proof status
 
-- 14 of 18 theorems: closed (zero `sorry`, axiom audit {propext, Classical.choice, Quot.sound})
-- 3 theorems (I1a, I2a, I3a): Robbins-Monro convergence content, `sorry` pending
-- The stochastic-approximation infrastructure for these 3 is proved separately in Pythia
+| Status | Count | Details |
+|--------|-------|---------|
+| Closed (zero sorry) | 12 | Core credit-assignment, eligibility-trace, distinguishability theorems |
+| Intentionally FALSE | 3 | ActorCriticAblation, ActorCritic (original form), VogelsSprekeler — these are the **refuted** theorems the paper reports. The `sorry` marks the counterexample witness. |
+| Robbins-Monro SA pending | 3 | TD0 (I1a), TDLambda (I2a), SARSA0 (I3a) — convergence depends on the stochastic-approximation theorem, proved in the companion Pythia library (sorry-free there) |
+
+Axiom audit on closed theorems: {propext, Classical.choice, Quot.sound}.
+
+## Counterexamples
+
+The three FALSE theorems are the paper's main result: they demonstrate that
+the commonly-retold forms of the actor-critic, actor-critic ablation, and
+Vogels-Sprekeler convergence theorems are false without their original
+boundedness hypotheses. The `sorry` in each file is immediately preceded by
+a concrete counterexample witness in comments.
 
 ## License
 
