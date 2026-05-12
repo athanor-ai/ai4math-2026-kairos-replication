@@ -6,10 +6,5 @@ name = "mathlib"
 scope = "leanprover-community"
 version = "git#v4.28.0"
 
-[[require]]
-name = "Pythia"
-git = "https://github.com/athanor-ai/pythia.git"
-rev = "main"
-
 [[lean_lib]]
 name = "CreditAssignment"

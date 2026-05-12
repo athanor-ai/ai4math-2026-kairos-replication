@@ -26,7 +26,7 @@ lean/                    Lean 4 formal proofs
 |--------|-------|---------|
 | Closed (zero sorry) | 12 | Core credit-assignment, eligibility-trace, distinguishability theorems |
 | Intentionally FALSE | 3 | ActorCriticAblation, ActorCritic (original form), VogelsSprekeler — these are the **refuted** theorems the paper reports. The `sorry` marks the counterexample witness. |
-| Robbins-Monro SA pending | 3 | TD0 (I1a), TDLambda (I2a), SARSA0 (I3a) — convergence depends on the stochastic-approximation theorem, proved in a companion stochastic-approximation library (sorry-free) |
+| Robbins-Monro SA pending | 3 | TD0 (I1a), TDLambda (I2a), SARSA0 (I3a) — convergence depends on the stochastic-approximation theorem, closed via documented axioms (the SA convergence theorem is stated as an explicit axiom with full mathematical specification) |
 
 Axiom audit on closed theorems: {propext, Classical.choice, Quot.sound}.
 
