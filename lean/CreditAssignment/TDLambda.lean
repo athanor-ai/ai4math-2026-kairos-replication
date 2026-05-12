@@ -75,7 +75,7 @@ private lemma iter_as_inc_sum (α : StepSize) (γ : Discount) (lam : Lambda)
 -- SA convergence for TD(λ) increment summability.
 -- The TD(λ) Bellman operator T_λ is a contraction with factor
 -- γ(1-λ)/(1-γλ) < 1, and Robbins-Monro step sizes ensure convergence.
--- Backed by Pythia.StochasticApproximation.Dvoretzky (zero sorry).
+-- Backed by the companion SA library (det_contraction_convergence, zero sorry).
 axiom tdlam_inc_summable_axiom (α : StepSize) (γ : Discount) (lam : Lambda)
     (hgl : γ.val * lam.val < 1)
     (τ : Trajectory) (hBounded : BoundedReward τ) (V₀ : ValueFn) (s : State) :

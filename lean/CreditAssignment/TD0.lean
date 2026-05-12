@@ -151,13 +151,13 @@ private lemma td0_eventually_unvisited_cauchy
   eventuallyConst_cauchySeq (td0_eventually_const α γ τ V₀ s T hT)
 
 /-- Robbins-Monro convergence for TD(0) on infinitely-visited states.
-Proved in Pythia.StochasticApproximation.Dvoretzky (det_contraction_convergence)
+Proved in the companion SA library (det_contraction_convergence)
 via the deterministic contraction lemma: the TD error |V_t(s) - V*| satisfies
   e_{t+1} ≤ (1 - α_t(1-γ)) e_t + α_t Rmax
 with Σα = ∞, Σα² < ∞, hence e_t → 0 and the iterate is Cauchy.
 Axiom-audit: this is the ONLY non-kernel axiom in the artifact.
-See github.com/athanor-ai/pythia StochasticApproximation/Dvoretzky.lean
-for the zero-sorry proof. -/
+See the companion SA library (StochasticApproximation/Dvoretzky.lean)
+for the zero-sorry proof of det_contraction_convergence. -/
 axiom td0_rm_cauchy (α : StepSize) (γ : Discount) (τ : Trajectory)
     (hBounded : BoundedReward τ) (V₀ : ValueFn) (s : State)
     (h_inf_visit : ∀ T, ∃ t, t ≥ T ∧ τ.states t = s) :
@@ -195,10 +195,10 @@ private lemma td0_cauchy_seq
     -- Robbins-Monro convergence for infinitely-visited states.
     -- The contraction argument: td0Iterate produces a sequence satisfying
     --   |V_{t+1}(s) - V*| ≤ (1 - α_t(1-γ))|V_t(s) - V*| + α_t · Rmax
-    -- with Σα_t = ∞, Σα_t² < ∞, and 1-γ > 0. By Pythia's
+    -- with Σα_t = ∞, Σα_t² < ∞, and 1-γ > 0. By the companion library's
     -- det_contraction_convergence (Dvoretzky.lean, zero sorry), the error
     -- converges to 0, hence the iterate is Cauchy.
-    -- Formally verified in Pythia.StochasticApproximation.Dvoretzky.
+    -- Formally verified in the companion SA library (Dvoretzky.lean).
     exact td0_rm_cauchy α γ τ hBounded V₀ s h
 
 /-- **I1a. TD(0) convergence** (content statement).
