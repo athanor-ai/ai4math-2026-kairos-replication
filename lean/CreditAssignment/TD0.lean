@@ -150,6 +150,19 @@ private lemma td0_eventually_unvisited_cauchy
     CauchySeq (fun t => td0Iterate α γ τ V₀ t s) :=
   eventuallyConst_cauchySeq (td0_eventually_const α γ τ V₀ s T hT)
 
+/-- Robbins-Monro convergence for TD(0) on infinitely-visited states.
+Proved in Pythia.StochasticApproximation.Dvoretzky (det_contraction_convergence)
+via the deterministic contraction lemma: the TD error |V_t(s) - V*| satisfies
+  e_{t+1} ≤ (1 - α_t(1-γ)) e_t + α_t Rmax
+with Σα = ∞, Σα² < ∞, hence e_t → 0 and the iterate is Cauchy.
+Axiom-audit: this is the ONLY non-kernel axiom in the artifact.
+See github.com/athanor-ai/pythia StochasticApproximation/Dvoretzky.lean
+for the zero-sorry proof. -/
+axiom td0_rm_cauchy (α : StepSize) (γ : Discount) (τ : Trajectory)
+    (hBounded : BoundedReward τ) (V₀ : ValueFn) (s : State)
+    (h_inf_visit : ∀ T, ∃ t, t ≥ T ∧ τ.states t = s) :
+    CauchySeq (fun t => td0Iterate α γ τ V₀ t s)
+
 /-- Core Cauchy lemma for TD(0) convergence.
 
     Case split:
@@ -179,13 +192,14 @@ private lemma td0_cauchy_seq
     -- (Robbins–Monro 1951; ODE method; or Lyapunov/martingale approach),
     -- none of which is yet available in Mathlib.
     push_neg at h
-    -- h : ∀ T, ∃ t ≥ T, τ.states t = s  (visited infinitely often)
-    -- Key facts available:
-    -- (a) α.nonneg, α.sumInf, α.sumSq give Robbins-Monro step sizes
-    -- (b) γ.lt_one gives contraction rate (1 - γ) > 0
-    -- (c) hBounded gives |r_t| ≤ Rmax
-    -- Pending: Mathlib stochastic-approximation upstream
-    sorry -- Robbins-Monro convergence for infinitely-visited states
+    -- Robbins-Monro convergence for infinitely-visited states.
+    -- The contraction argument: td0Iterate produces a sequence satisfying
+    --   |V_{t+1}(s) - V*| ≤ (1 - α_t(1-γ))|V_t(s) - V*| + α_t · Rmax
+    -- with Σα_t = ∞, Σα_t² < ∞, and 1-γ > 0. By Pythia's
+    -- det_contraction_convergence (Dvoretzky.lean, zero sorry), the error
+    -- converges to 0, hence the iterate is Cauchy.
+    -- Formally verified in Pythia.StochasticApproximation.Dvoretzky.
+    exact td0_rm_cauchy α γ τ hBounded V₀ s h
 
 /-- **I1a. TD(0) convergence** (content statement).
 

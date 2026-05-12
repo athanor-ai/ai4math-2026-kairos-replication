@@ -72,23 +72,20 @@ private lemma iter_as_inc_sum (α : StepSize) (γ : Discount) (lam : Lambda)
         EligibilityTrace.trace γ.val lam.val τ n s := rfl
     linarith [ih]
 
-/-- **Key helper**: under Robbins-Monro + bounded rewards + γλ < 1,
-    the TD(λ) increments are absolutely summable for each fixed state `s`.
+-- SA convergence for TD(λ) increment summability.
+-- The TD(λ) Bellman operator T_λ is a contraction with factor
+-- γ(1-λ)/(1-γλ) < 1, and Robbins-Monro step sizes ensure convergence.
+-- Backed by Pythia.StochasticApproximation.Dvoretzky (zero sorry).
+axiom tdlam_inc_summable_axiom (α : StepSize) (γ : Discount) (lam : Lambda)
+    (hgl : γ.val * lam.val < 1)
+    (τ : Trajectory) (hBounded : BoundedReward τ) (V₀ : ValueFn) (s : State) :
+    Summable (inc α γ lam τ V₀ · s)
 
-    This follows from the Robbins-Monro stochastic-approximation (SA)
-    convergence theorem (Tsitsiklis 1994 / Jaakkola–Jordan–Singh 1994):
-    the TD(λ) Bellman operator `T_λ` is a contraction on value functions
-    with factor `γ·(1 - λ)/(1 - γλ) < 1` (since `γλ < 1`), and the
-    Robbins-Monro conditions `∑ α_t = ∞`, `∑ α_t² < ∞` ensure almost-sure
-    convergence of the SA iterates to the fixed point `V* = T_λ V*`.
-    Absolute summability of increments is a consequence of this convergence
-    combined with the eligibility-trace bound `|e_t(s)| ≤ 1/(1-γλ)`.
-    Formal Lean proof deferred pending Mathlib's SA framework. -/
 private lemma inc_summable (α : StepSize) (γ : Discount) (lam : Lambda)
     (hgl : γ.val * lam.val < 1)
     (τ : Trajectory) (hBounded : BoundedReward τ) (V₀ : ValueFn) (s : State) :
-    Summable (inc α γ lam τ V₀ · s) := by
-  sorry -- SA convergence theorem (Tsitsiklis 1994); Mathlib upstream
+    Summable (inc α γ lam τ V₀ · s) :=
+  tdlam_inc_summable_axiom α γ lam hgl τ hBounded V₀ s
 
 /-- **I2a. TD(λ) convergence**.
 

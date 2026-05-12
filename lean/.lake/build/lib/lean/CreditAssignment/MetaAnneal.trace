@@ -1,0 +1,55 @@
+{"synthetic": false,
+ "schemaVersion": "2025-09-10",
+ "outputs":
+ {"o": ["aac843585818024a.olean"],
+  "i": "cb38f022eb88e49d.ilean",
+  "c": "9d06613be35715fe.c"},
+ "log":
+ [{"message":
+   ".> LEAN_PATH=/tmp/ai4math-replication/lean/.lake/packages/Cli/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/batteries/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/Qq/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/aesop/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/importGraph/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/plausible/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/mathlib/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/packages/Pythia/.lake/build/lib/lean:/tmp/ai4math-replication/lean/.lake/build/lib/lean /home/azureuser/.elan/toolchains/leanprover--lean4---v4.28.0/bin/lean /tmp/ai4math-replication/lean/CreditAssignment/MetaAnneal.lean -o /tmp/ai4math-replication/lean/.lake/build/lib/lean/CreditAssignment/MetaAnneal.olean -i /tmp/ai4math-replication/lean/.lake/build/lib/lean/CreditAssignment/MetaAnneal.ilean -c /tmp/ai4math-replication/lean/.lake/build/ir/CreditAssignment/MetaAnneal.c --setup /tmp/ai4math-replication/lean/.lake/build/ir/CreditAssignment/MetaAnneal.setup.json --json",
+   "level": "trace"},
+  {"message":
+   "CreditAssignment/MetaAnneal.lean:74:5: unused variable `heff_lo`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "CreditAssignment/MetaAnneal.lean:95:5: unused variable `h_order_c`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "CreditAssignment/MetaAnneal.lean:96:5: unused variable `h_slow_pos`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "CreditAssignment/MetaAnneal.lean:96:31: unused variable `h_fast_pos`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "CreditAssignment/MetaAnneal.lean:97:5: unused variable `h_slow_lt1`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "CreditAssignment/MetaAnneal.lean:97:31: unused variable `h_fast_lt1`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "CreditAssignment/MetaAnneal.lean:98:5: unused variable `h_d_slow_pos`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"}],
+ "inputs":
+ [["CreditAssignment.MetaAnneal:deps",
+   [["deps",
+     [["CreditAssignment/CreditAssignment:extraDep",
+       [["@CreditAssignment:extraDep", "00000000000006bb"]]],
+      ["imports",
+       [["CreditAssignment.Basic transitive imports (legacy)",
+         "6aec46451c69913f"],
+        ["CreditAssignment.Basic:importAllArts", "c6ba5485d78fac81"],
+        ["CreditAssignment.ActorCritic transitive imports (legacy)",
+         "0173b564859aca05"],
+        ["CreditAssignment.ActorCritic:importAllArts", "cfd5b5aae4c5e5de"]]]]],
+    ["libs",
+     [["import dynlibs", "00000000000006bb"],
+      ["package external libraries", "00000000000006bb"],
+      ["module dynlibs", "00000000000006bb"],
+      ["module plugins", "00000000000006bb"]]]]],
+  ["Lean 4.28.0, commit 7e01a1bf5c70fc6167d49c345d3bf80596e9a79b",
+   "a96bc04a2e5e9630"],
+  ["/tmp/ai4math-replication/lean/CreditAssignment/MetaAnneal.lean",
+   "fcb04f2804f93de1"],
+  ["options", "00000000000006bb"],
+  ["Module.leanArgs: #[]", "00000000000006bb"]],
+ "depHash": "7a0c28917e494e28"}
